@@ -5,13 +5,20 @@ export default function BottleDetail({ bottle, onClose, onEdit, onDelete }) {
 
   if (!bottle) return null;
 
-  const { icki_adi, icki_turu, sise_turu, fotograflar, alinma_tarihi, alindigi_yer, fiyat } = bottle;
+  const { icki_adi, icki_turu, sise_turu, fotograflar, alinma_tarihi, alindigi_yer, fiyat, para_birimi } = bottle;
   const hasPhotos = fotograflar && fotograflar.length > 0;
   
   // Format price
-  const formatPrice = (val) => {
+  const formatPrice = (val, currencyCode) => {
     if (val === null || val === undefined || val === '') return 'Belirtilmemiş';
-    return new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY' }).format(val);
+    const code = currencyCode || 'TL';
+    const isISO = ['USD', 'EUR', 'GBP', 'TRY'].includes(code);
+    if (isISO) {
+      return new Intl.NumberFormat('tr-TR', { style: 'currency', currency: code }).format(val);
+    }
+    // For custom codes or 'TL'
+    const displayCode = code === 'TL' ? 'TL' : code;
+    return `${val} ${displayCode}`;
   };
 
   // Format date
@@ -89,7 +96,7 @@ export default function BottleDetail({ bottle, onClose, onEdit, onDelete }) {
                 <div className="detail-field">
                   <span className="field-label">Fiyat / Maliyet</span>
                   <span className="field-value" style={{ color: fiyat ? 'var(--primary)' : 'inherit' }}>
-                    {formatPrice(fiyat)}
+                    {formatPrice(fiyat, para_birimi)}
                   </span>
                 </div>
 

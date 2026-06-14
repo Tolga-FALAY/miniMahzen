@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-export default function BottleGrid({ bottles, onSelectBottle }) {
+export default function BottleGrid({ bottles, categories = [], materials = [], onSelectBottle }) {
   const [quickSearch, setQuickSearch] = useState('');
   const [freeSearch, setFreeSearch] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('');
@@ -16,9 +16,15 @@ export default function BottleGrid({ bottles, onSelectBottle }) {
   };
 
   // Format currency helper
-  const formatPrice = (val) => {
+  const formatPrice = (val, currencyCode) => {
     if (val === null || val === undefined || val === '') return '';
-    return new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY', maximumFractionDigits: 0 }).format(val);
+    const code = currencyCode || 'TL';
+    const isISO = ['USD', 'EUR', 'GBP', 'TRY'].includes(code);
+    if (isISO) {
+      return new Intl.NumberFormat('tr-TR', { style: 'currency', currency: code, maximumFractionDigits: 0 }).format(val);
+    }
+    const displayCode = code === 'TL' ? 'TL' : code;
+    return `${val} ${displayCode}`;
   };
 
   // Filter bottles
@@ -123,16 +129,9 @@ export default function BottleGrid({ bottles, onSelectBottle }) {
             <label>İçki Türü</label>
             <select value={categoryFilter} onChange={(e) => setCategoryFilter(e.target.value)}>
               <option value="">Tüm Türler</option>
-              <option value="Viski">Viski</option>
-              <option value="Cin">Cin</option>
-              <option value="Votka">Votka</option>
-              <option value="Rom">Rom</option>
-              <option value="Likör">Likör</option>
-              <option value="Tekila">Tekila</option>
-              <option value="Rakı">Rakı</option>
-              <option value="Konyak">Konyak</option>
-              <option value="Şarap">Şarap</option>
-              <option value="Diğer">Diğer</option>
+              {categories.map(c => (
+                <option key={c.id} value={c.name}>{c.name}</option>
+              ))}
             </select>
           </div>
 
@@ -140,10 +139,9 @@ export default function BottleGrid({ bottles, onSelectBottle }) {
             <label>Şişe Türü (Materyal)</label>
             <select value={materialFilter} onChange={(e) => setMaterialFilter(e.target.value)}>
               <option value="">Tüm Materyaller</option>
-              <option value="Cam">Cam</option>
-              <option value="Plastik">Plastik</option>
-              <option value="Metal">Metal</option>
-              <option value="Seramik">Seramik</option>
+              {materials.map(m => (
+                <option key={m.id} value={m.name}>{m.name}</option>
+              ))}
             </select>
           </div>
 
@@ -212,7 +210,7 @@ export default function BottleGrid({ bottles, onSelectBottle }) {
                     <div className="bottle-meta">
                       <span className="bottle-category">{bottle.icki_turu || 'Diğer'}</span>
                       {bottle.fiyat && (
-                        <span className="bottle-price">{formatPrice(bottle.fiyat)}</span>
+                        <span className="bottle-price">{formatPrice(bottle.fiyat, bottle.para_birimi)}</span>
                       )}
                     </div>
                     <h3 className="bottle-name">{bottle.icki_adi}</h3>

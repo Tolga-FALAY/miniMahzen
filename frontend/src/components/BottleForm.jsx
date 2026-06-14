@@ -9,15 +9,39 @@ export default function BottleForm({ bottle, onClose, onSave }) {
     fotograflar: [],
     alinma_tarihi: '',
     alindigi_yer: '',
-    fiyat: ''
+    fiyat: '',
+    para_birimi: 'TL'
   });
   
+  const [categories, setCategories] = useState([]);
+  const [materials, setMaterials] = useState([]);
+  const [currencies, setCurrencies] = useState([]);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   
   const cameraInputRef = useRef(null);
   const fileInputRef = useRef(null);
 
+  // Load parameters on mount
+  useEffect(() => {
+    const fetchParams = async () => {
+      try {
+        const [cats, mats, curs] = await Promise.all([
+          api.getCategories(),
+          api.getMaterials(),
+          api.getCurrencies()
+        ]);
+        setCategories(cats);
+        setMaterials(mats);
+        setCurrencies(curs);
+      } catch (err) {
+        console.error("Parametreler yüklenemedi:", err);
+      }
+    };
+    fetchParams();
+  }, []);
+
+  // Sync bottle data in edit mode
   useEffect(() => {
     if (bottle) {
       setFormData({
@@ -27,7 +51,8 @@ export default function BottleForm({ bottle, onClose, onSave }) {
         fotograflar: bottle.fotograflar || [],
         alinma_tarihi: bottle.alinma_tarihi || '',
         alindigi_yer: bottle.alindigi_yer || '',
-        fiyat: bottle.fiyat !== null ? bottle.fiyat : ''
+        fiyat: bottle.fiyat !== null ? bottle.fiyat : '',
+        para_birimi: bottle.para_birimi || 'TL'
       });
     }
   }, [bottle]);
@@ -100,7 +125,6 @@ export default function BottleForm({ bottle, onClose, onSave }) {
       setError('Görseller yüklenirken bir hata oluştu: ' + err.message);
     } finally {
       setLoading(false);
-      // Reset inputs so the same files can be selected again if deleted
       if (fileInputRef.current) fileInputRef.current.value = '';
       if (cameraInputRef.current) cameraInputRef.current.value = '';
     }
@@ -119,7 +143,7 @@ export default function BottleForm({ bottle, onClose, onSave }) {
     setFormData(prev => {
       const newPhotos = [...prev.fotograflar];
       const mainPhoto = newPhotos.splice(indexToMakeMain, 1)[0];
-      newPhotos.unshift(mainPhoto); // Put at index 0
+      newPhotos.unshift(mainPhoto);
       return {
         ...prev,
         fotograflar: newPhotos
@@ -145,10 +169,8 @@ export default function BottleForm({ bottle, onClose, onSave }) {
       };
 
       if (bottle) {
-        // Edit Mode
         await api.updateBottle(bottle.id, payload);
       } else {
-        // Add Mode
         await api.createBottle(payload);
       }
       onSave();
@@ -161,75 +183,68 @@ export default function BottleForm({ bottle, onClose, onSave }) {
 
   return (
     <div className="modal-overlay">
-      <div className="modal-content">
+      {/* Scroll bug fixed: The form acts directly as the modal-content container */}
+      <form className="modal-content" onSubmit={handleSubmit} style={{ height: '90vh', display: 'flex', flexDirection: 'column' }}>
         <div className="modal-header">
           <h2>{bottle ? 'İçki Kartını Düzenle' : 'Koleksiyona Şişe Ekle'}</h2>
-          <button className="close-btn" onClick={onClose} disabled={loading}>&times;</button>
+          <button type="button" className="close-btn" onClick={onClose} disabled={loading}>&times;</button>
         </div>
 
-        <form onSubmit={handleSubmit}>
-          <div className="modal-body">
-            {error && <div style={{ color: 'var(--danger)', marginBottom: '1rem', fontWeight: 600, fontSize: '0.9rem' }}>{error}</div>}
+        <div className="modal-body" style={{ overflowY: 'auto', flexGrow: 1 }}>
+          {error && <div style={{ color: 'var(--danger)', marginBottom: '1rem', fontWeight: 600, fontSize: '0.9rem' }}>{error}</div>}
 
-            {/* Zorunlu Alanlar */}
+          {/* Zorunlu Alanlar */}
+          <div className="form-group">
+            <label>İçki Adı <span className="required">*</span></label>
+            <input 
+              type="text" 
+              name="icki_adi" 
+              value={formData.icki_adi} 
+              onChange={handleChange} 
+              placeholder="Örn: Hendrick's Gin, Jägermeister" 
+              required 
+              disabled={loading}
+            />
+          </div>
+
+          <div className="form-group-row">
             <div className="form-group">
-              <label>İçki Adı <span className="required">*</span></label>
+              <label>İçki Türü (Kategori)</label>
+              <select name="icki_turu" value={formData.icki_turu} onChange={handleChange} disabled={loading}>
+                <option value="">Seçiniz...</option>
+                {categories.map(c => (
+                  <option key={c.id} value={c.name}>{c.name}</option>
+                ))}
+              </select>
+            </div>
+
+            <div className="form-group">
+              <label>Şişe Türü (Materyal)</label>
+              <select name="sise_turu" value={formData.sise_turu} onChange={handleChange} disabled={loading}>
+                <option value="">Seçiniz...</option>
+                {materials.map(m => (
+                  <option key={m.id} value={m.name}>{m.name}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          {/* Opsiyonel Alanlar */}
+          <div className="form-group-row">
+            <div className="form-group">
+              <label>Satın Alım/Hediye Tarihi</label>
               <input 
-                type="text" 
-                name="icki_adi" 
-                value={formData.icki_adi} 
+                type="date" 
+                name="alinma_tarihi" 
+                value={formData.alinma_tarihi} 
                 onChange={handleChange} 
-                placeholder="Örn: Hendrick's Gin, Macallan 12" 
-                required 
                 disabled={loading}
               />
             </div>
 
-            <div className="form-group-row">
-              <div className="form-group">
-                <label>İçki Türü (Kategori)</label>
-                <select name="icki_turu" value={formData.icki_turu} onChange={handleChange} disabled={loading}>
-                  <option value="">Seçiniz...</option>
-                  <option value="Viski">Viski</option>
-                  <option value="Cin">Cin</option>
-                  <option value="Votka">Votka</option>
-                  <option value="Rom">Rom</option>
-                  <option value="Likör">Likör</option>
-                  <option value="Tekila">Tekila</option>
-                  <option value="Rakı">Rakı</option>
-                  <option value="Konyak">Konyak</option>
-                  <option value="Şarap">Şarap</option>
-                  <option value="Diğer">Diğer</option>
-                </select>
-              </div>
-
-              <div className="form-group">
-                <label>Şişe Türü (Materyal)</label>
-                <select name="sise_turu" value={formData.sise_turu} onChange={handleChange} disabled={loading}>
-                  <option value="">Seçiniz...</option>
-                  <option value="Cam">Cam</option>
-                  <option value="Plastik">Plastik</option>
-                  <option value="Metal">Metal</option>
-                  <option value="Seramik">Seramik</option>
-                </select>
-              </div>
-            </div>
-
-            {/* Opsiyonel Alanlar */}
-            <div className="form-group-row">
-              <div className="form-group">
-                <label>Satın Alım/Hediye Tarihi</label>
-                <input 
-                  type="date" 
-                  name="alinma_tarihi" 
-                  value={formData.alinma_tarihi} 
-                  onChange={handleChange} 
-                  disabled={loading}
-                />
-              </div>
-
-              <div className="form-group">
-                <label>Fiyat (Maliyet)</label>
+            <div className="form-group">
+              <label>Fiyat (Maliyet)</label>
+              <div style={{ display: 'flex', gap: '0.5rem' }}>
                 <input 
                   type="number" 
                   name="fiyat" 
@@ -239,150 +254,162 @@ export default function BottleForm({ bottle, onClose, onSave }) {
                   step="any" 
                   min="0"
                   disabled={loading}
+                  style={{ flex: 1 }}
                 />
+                <select 
+                  name="para_birimi" 
+                  value={formData.para_birimi} 
+                  onChange={handleChange} 
+                  disabled={loading}
+                  style={{ width: '90px', paddingRight: '1.5rem' }}
+                >
+                  {currencies.map(c => (
+                    <option key={c.id} value={c.code}>{c.code}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div className="form-group">
+            <label>Alındığı Yer / Hediye Eden Kişi</label>
+            <input 
+              type="text" 
+              name="alindigi_yer" 
+              value={formData.alindigi_yer} 
+              onChange={handleChange} 
+              placeholder="Örn: Duty Free, London Shop, Ahmet Yılmaz" 
+              disabled={loading}
+            />
+          </div>
+
+          {/* Görsel Yükleme Bölümü */}
+          <div className="form-group">
+            <label>Şişe Görselleri (Çoklu Yüklenebilir)</label>
+            <div 
+              className="photo-upload-section" 
+              onClick={() => fileInputRef.current?.click()}
+            >
+              <div className="upload-icon">📸</div>
+              <div className="upload-text">Fotoğraf yüklemek için buraya tıklayın</div>
+              <div className="upload-text" style={{ fontSize: '0.75rem', marginTop: '0.25rem', color: 'var(--text-muted)' }}>
+                (İlk yüklenen görsel otomatik olarak ana vitrin resmi olur)
               </div>
             </div>
 
-            <div className="form-group">
-              <label>Alındığı Yer / Hediye Eden Kişi</label>
-              <input 
-                type="text" 
-                name="alindigi_yer" 
-                value={formData.alindigi_yer} 
-                onChange={handleChange} 
-                placeholder="Örn: Duty Free, London Shop, Ahmet Yılmaz" 
+            <div className="upload-methods-grid">
+              <button 
+                type="button" 
+                className="btn btn-sm btn-outline" 
+                onClick={(e) => { e.stopPropagation(); cameraInputRef.current?.click(); }}
                 disabled={loading}
-              />
-            </div>
-
-            {/* Görsel Yükleme Bölümü */}
-            <div className="form-group">
-              <label>Şişe Görselleri (Çoklu Yüklenebilir)</label>
-              <div 
-                className="photo-upload-section" 
-                onClick={() => fileInputRef.current?.click()}
               >
-                <div className="upload-icon">📸</div>
-                <div className="upload-text">Fotoğraf yüklemek için buraya tıklayın</div>
-                <div className="upload-text" style={{ fontSize: '0.75rem', marginTop: '0.25rem', color: 'var(--text-muted)' }}>
-                  (İlk yüklenen görsel otomatik olarak ana vitrin resmi olur)
-                </div>
-              </div>
-
-              <div className="upload-methods-grid">
-                <button 
-                  type="button" 
-                  className="btn btn-sm btn-outline" 
-                  onClick={(e) => { e.stopPropagation(); cameraInputRef.current?.click(); }}
-                  disabled={loading}
-                >
-                  📷 Fotoğraf Çek
-                </button>
-                <button 
-                  type="button" 
-                  className="btn btn-sm btn-outline" 
-                  onClick={(e) => { e.stopPropagation(); fileInputRef.current?.click(); }}
-                  disabled={loading}
-                >
-                  📂 Galeriden Seç
-                </button>
-                <button 
-                  type="button" 
-                  className="btn btn-sm btn-outline" 
-                  onClick={async (e) => {
-                    e.stopPropagation();
-                    try {
-                      if (!navigator.clipboard || !navigator.clipboard.read) {
-                        throw new Error("Tarayıcı doğrudan pano okumayı desteklemiyor. Ctrl+V kullanabilirsiniz.");
-                      }
-                      const items = await navigator.clipboard.read();
-                      for (const item of items) {
-                        for (const type of item.types) {
-                          if (type.startsWith('image/')) {
-                            const blob = await item.getType(type);
-                            setLoading(true);
-                            const compressed = await compressImage(blob);
-                            setFormData(prev => ({
-                              ...prev,
-                              fotograflar: [...prev.fotograflar, compressed]
-                            }));
-                            setLoading(false);
-                            return;
-                          }
+                📷 Fotoğraf Çek
+              </button>
+              <button 
+                type="button" 
+                className="btn btn-sm btn-outline" 
+                onClick={(e) => { e.stopPropagation(); fileInputRef.current?.click(); }}
+                disabled={loading}
+              >
+                📂 Galeriden Seç
+              </button>
+              <button 
+                type="button" 
+                className="btn btn-sm btn-outline" 
+                onClick={async (e) => {
+                  e.stopPropagation();
+                  try {
+                    if (!navigator.clipboard || !navigator.clipboard.read) {
+                      throw new Error("Tarayıcı doğrudan pano okumayı desteklemiyor. Ctrl+V kullanabilirsiniz.");
+                    }
+                    const items = await navigator.clipboard.read();
+                    for (const item of items) {
+                      for (const type of item.types) {
+                        if (type.startsWith('image/')) {
+                          const blob = await item.getType(type);
+                          setLoading(true);
+                          const compressed = await compressImage(blob);
+                          setFormData(prev => ({
+                            ...prev,
+                            fotograflar: [...prev.fotograflar, compressed]
+                          }));
+                          setLoading(false);
+                          return;
                         }
                       }
-                      alert("Panoda kopyalanmış bir görsel bulunamadı!");
-                    } catch (err) {
-                      alert("Panodan okuma başarısız: " + err.message);
                     }
-                  }}
-                  disabled={loading}
-                >
-                  📋 Pano'dan Yapıştır
-                </button>
-              </div>
+                    alert("Panoda kopyalanmış bir görsel bulunamadı!");
+                  } catch (err) {
+                    alert("Panodan okuma başarısız: " + err.message);
+                  }
+                }}
+                disabled={loading}
+              >
+                📋 Pano'dan Yapıştır
+              </button>
+            </div>
 
-              {/* Gizli Input'lar */}
-              <input 
-                type="file" 
-                ref={fileInputRef} 
-                accept="image/*" 
-                multiple 
-                style={{ display: 'none' }} 
-                onChange={handlePhotosUpload} 
-              />
-              <input 
-                type="file" 
-                ref={cameraInputRef} 
-                accept="image/*" 
-                capture="environment" 
-                style={{ display: 'none' }} 
-                onChange={handlePhotosUpload} 
-              />
+            {/* Gizli Input'lar */}
+            <input 
+              type="file" 
+              ref={fileInputRef} 
+              accept="image/*" 
+              multiple 
+              style={{ display: 'none' }} 
+              onChange={handlePhotosUpload} 
+            />
+            <input 
+              type="file" 
+              ref={cameraInputRef} 
+              accept="image/*" 
+              capture="environment" 
+              style={{ display: 'none' }} 
+              onChange={handlePhotosUpload} 
+            />
 
-              {/* Görsel Önizleme Listesi */}
-              {formData.fotograflar.length > 0 && (
-                <div className="photos-previews-list">
-                  {formData.fotograflar.map((photo, index) => (
-                    <div key={index} className="photo-preview-item">
-                      <img src={photo} alt={`Şişe Önizleme ${index}`} />
+            {/* Görsel Önizleme Listesi */}
+            {formData.fotograflar.length > 0 && (
+              <div className="photos-previews-list">
+                {formData.fotograflar.map((photo, index) => (
+                  <div key={index} className="photo-preview-item">
+                    <img src={photo} alt={`Şişe Önizleme ${index}`} />
+                    <button 
+                      type="button" 
+                      className="photo-delete-badge" 
+                      onClick={() => handleRemovePhoto(index)}
+                      title="Görseli Sil"
+                      disabled={loading}
+                    >
+                      &times;
+                    </button>
+                    
+                    {index === 0 ? (
+                      <div className="main-photo-indicator">Vitrin Resmi</div>
+                    ) : (
                       <button 
                         type="button" 
-                        className="photo-delete-badge" 
-                        onClick={() => handleRemovePhoto(index)}
-                        title="Görseli Sil"
+                        className="make-main-button" 
+                        onClick={() => handleMakeShowcase(index)}
                         disabled={loading}
                       >
-                        &times;
+                        Vitrin Yap
                       </button>
-                      
-                      {index === 0 ? (
-                        <div className="main-photo-indicator">Vitrin Resmi</div>
-                      ) : (
-                        <button 
-                          type="button" 
-                          className="make-main-button" 
-                          onClick={() => handleMakeShowcase(index)}
-                          disabled={loading}
-                        >
-                          Vitrin Yap
-                        </button>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
+        </div>
 
-          <div className="form-footer">
-            <button type="button" className="btn btn-outline" onClick={onClose} disabled={loading}>İptal</button>
-            <button type="submit" className="btn btn-primary" disabled={loading}>
-              {loading ? 'Kaydediliyor...' : bottle ? 'Değişiklikleri Kaydet' : 'Koleksiyona Ekle'}
-            </button>
-          </div>
-        </form>
-      </div>
+        <div className="form-footer" style={{ borderTop: '1px solid var(--border-color)', padding: '1.5rem', display: 'flex', justifyContent: 'flex-end', gap: '1rem' }}>
+          <button type="button" className="btn btn-outline" onClick={onClose} disabled={loading}>İptal</button>
+          <button type="submit" className="btn btn-primary" disabled={loading}>
+            {loading ? 'Kaydediliyor...' : bottle ? 'Değişiklikleri Kaydet' : 'Koleksiyona Ekle'}
+          </button>
+        </div>
+      </form>
     </div>
   );
 }

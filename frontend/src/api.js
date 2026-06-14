@@ -43,5 +43,53 @@ export const api = {
   // DELETE - Remove Bottle
   deleteBottle: async (id) => {
     return request(`/bottles/${id}`, 'DELETE');
+  },
+
+  // ========================
+  // CATEGORIES API
+  // ========================
+  getCategories: async () => {
+    return request('/categories');
+  },
+  createCategory: async (data) => {
+    return request('/categories', 'POST', data);
+  },
+  updateCategory: async (id, data) => {
+    return request(`/categories/${id}`, 'PUT', data);
+  },
+  deleteCategory: async (id) => {
+    return request(`/categories/${id}`, 'DELETE');
+  },
+
+  // ========================
+  // MATERIALS API
+  // ========================
+  getMaterials: async () => {
+    return request('/materials');
+  },
+  createMaterial: async (data) => {
+    return request('/materials', 'POST', data);
+  },
+  updateMaterial: async (id, data) => {
+    return request(`/materials/${id}`, 'PUT', data);
+  },
+  deleteMaterial: async (id) => {
+    return request(`/materials/${id}`, 'DELETE');
+  },
+
+  // ========================
+  // CURRENCIES API
+  // ========================
+  getCurrencies: async () => {
+    return request('/currencies');
+  },
+  createCurrency: async (data) => {
+    return request('/currencies', 'POST', data);
+  },
+  updateCurrency: async (id, data) => {
+    return request(`/currencies/${id}`, 'PUT', data);
+  },
+  deleteCurrency: async (id) => {
+    return request(`/currencies/${id}`, 'DELETE');
   }
 };

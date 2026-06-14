@@ -3,15 +3,20 @@ import { api } from './api';
 import BottleGrid from './components/BottleGrid';
 import BottleDetail from './components/BottleDetail';
 import BottleForm from './components/BottleForm';
+import ParameterManager from './components/ParameterManager';
 
 export default function App() {
   const [bottles, setBottles] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [materials, setMaterials] = useState([]);
+  const [currencies, setCurrencies] = useState([]);
   const [selectedBottle, setSelectedBottle] = useState(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
+  const [isParamOpen, setIsParamOpen] = useState(false);
   const [editingBottle, setEditingBottle] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  // Fetch bottles from API on component mount
+  // Fetch bottles from API
   const loadBottles = async () => {
     setLoading(true);
     try {
@@ -25,8 +30,25 @@ export default function App() {
     }
   };
 
+  // Fetch parameter lists (categories and materials)
+  const loadParameters = async () => {
+    try {
+      const [cats, mats, curs] = await Promise.all([
+        api.getCategories(),
+        api.getMaterials(),
+        api.getCurrencies()
+      ]);
+      setCategories(cats);
+      setMaterials(mats);
+      setCurrencies(curs);
+    } catch (err) {
+      console.error("Parametre verileri yüklenirken hata:", err);
+    }
+  };
+
   useEffect(() => {
     loadBottles();
+    loadParameters();
   }, []);
 
   // Save handler (Add/Edit complete)
@@ -35,7 +57,6 @@ export default function App() {
     setEditingBottle(null);
     loadBottles();
     
-    // If we were viewing details of a bottle and edited it, clear selection to reload fresh details next time
     if (selectedBottle) {
       setSelectedBottle(null);
     }
@@ -59,6 +80,12 @@ export default function App() {
     setIsFormOpen(true);
   };
 
+  // Triggered when parameters are updated (add, edit, delete categories/materials)
+  const handleParametersUpdated = () => {
+    loadParameters();
+    loadBottles(); // Reload bottles to reflect changed names
+  };
+
   return (
     <div className="app-container">
       {/* Header */}
@@ -68,6 +95,12 @@ export default function App() {
           <h1>Mini Mahzen</h1>
         </a>
         <div className="header-actions">
+          <button 
+            className="btn btn-outline"
+            onClick={() => setIsParamOpen(true)}
+          >
+            ⚙️ Parametreleri Yönet
+          </button>
           <button 
             className="btn btn-primary"
             onClick={() => { setEditingBottle(null); setIsFormOpen(true); }}
@@ -108,6 +141,8 @@ export default function App() {
             
             <BottleGrid 
               bottles={bottles} 
+              categories={categories}
+              materials={materials}
               onSelectBottle={setSelectedBottle} 
             />
           </>
@@ -142,6 +177,14 @@ export default function App() {
           bottle={editingBottle}
           onClose={() => { setIsFormOpen(false); setEditingBottle(null); }}
           onSave={handleSave}
+        />
+      )}
+
+      {/* Dynamic Parameters Modal */}
+      {isParamOpen && (
+        <ParameterManager 
+          onClose={() => setIsParamOpen(false)}
+          onUpdate={handleParametersUpdated}
         />
       )}
     </div>
