@@ -49,7 +49,7 @@ app.get('/api/bottles', (req, res) => {
 // POST - Create a new bottle
 app.post('/api/bottles', (req, res) => {
     try {
-        const { icki_adi, icki_turu, sise_turu, fotograflar, alinma_tarihi, alindigi_yer, fiyat, para_birimi } = req.body;
+        const { marka, icki_adi, ek_bilgiler, icki_turu, sise_turu, fotograflar, alinma_tarihi, alindigi_yer, fiyat, para_birimi } = req.body;
         
         if (!icki_adi || !icki_adi.trim()) {
             return res.status(400).json({ error: 'İçki adı zorunludur!' });
@@ -59,13 +59,15 @@ app.post('/api/bottles', (req, res) => {
         const photosJSON = fotograflar ? JSON.stringify(fotograflar) : '[]';
 
         const stmt = db.prepare(`
-            INSERT INTO Bottles (id, icki_adi, icki_turu, sise_turu, fotograflar, alinma_tarihi, alindigi_yer, fiyat, para_birimi, createdAt, updatedAt)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+            INSERT INTO Bottles (id, marka, icki_adi, ek_bilgiler, icki_turu, sise_turu, fotograflar, alinma_tarihi, alindigi_yer, fiyat, para_birimi, createdAt, updatedAt)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
         `);
 
         stmt.run(
             id,
+            marka ? marka.trim() : null,
             icki_adi.trim(),
+            ek_bilgiler ? ek_bilgiler.trim() : null,
             icki_turu || null,
             sise_turu || null,
             photosJSON,
@@ -85,7 +87,7 @@ app.post('/api/bottles', (req, res) => {
 app.put('/api/bottles/:id', (req, res) => {
     try {
         const { id } = req.params;
-        const { icki_adi, icki_turu, sise_turu, fotograflar, alinma_tarihi, alindigi_yer, fiyat, para_birimi } = req.body;
+        const { marka, icki_adi, ek_bilgiler, icki_turu, sise_turu, fotograflar, alinma_tarihi, alindigi_yer, fiyat, para_birimi } = req.body;
 
         if (!icki_adi || !icki_adi.trim()) {
             return res.status(400).json({ error: 'İçki adı zorunludur!' });
@@ -100,12 +102,14 @@ app.put('/api/bottles/:id', (req, res) => {
 
         const stmt = db.prepare(`
             UPDATE Bottles 
-            SET icki_adi = ?, icki_turu = ?, sise_turu = ?, fotograflar = ?, alinma_tarihi = ?, alindigi_yer = ?, fiyat = ?, para_birimi = ?, updatedAt = CURRENT_TIMESTAMP
+            SET marka = ?, icki_adi = ?, ek_bilgiler = ?, icki_turu = ?, sise_turu = ?, fotograflar = ?, alinma_tarihi = ?, alindigi_yer = ?, fiyat = ?, para_birimi = ?, updatedAt = CURRENT_TIMESTAMP
             WHERE id = ?
         `);
 
         stmt.run(
+            marka ? marka.trim() : null,
             icki_adi.trim(),
+            ek_bilgiler ? ek_bilgiler.trim() : null,
             icki_turu || null,
             sise_turu || null,
             photosJSON,

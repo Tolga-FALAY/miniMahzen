@@ -1,18 +1,14 @@
 import React, { useState } from 'react';
 
 export default function BottleGrid({ bottles, categories = [], materials = [], onSelectBottle }) {
-  const [quickSearch, setQuickSearch] = useState('');
   const [freeSearch, setFreeSearch] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('');
   const [materialFilter, setMaterialFilter] = useState('');
-  const [sortBy, setSortBy] = useState('newest'); // 'newest', 'oldest', 'alpha_asc', 'alpha_desc', 'price_asc', 'price_desc'
 
   const clearFilters = () => {
-    setQuickSearch('');
     setFreeSearch('');
     setCategoryFilter('');
     setMaterialFilter('');
-    setSortBy('newest');
   };
 
   // Format currency helper
@@ -29,44 +25,39 @@ export default function BottleGrid({ bottles, categories = [], materials = [], o
 
   // Filter bottles
   const filteredBottles = bottles.filter(bottle => {
-    // 1. Quick Search: matches ONLY name (case-insensitive, Turkish locale aware)
-    if (quickSearch.trim()) {
-      const q = quickSearch.toLocaleLowerCase('tr-TR').trim();
-      const name = (bottle.icki_adi || '').toLocaleLowerCase('tr-TR');
-      if (!name.includes(q)) {
-        return false;
-      }
-    }
-
-    // 2. Free Search: matches name, category, material, location, date, price (all fields)
+    // Free Search: matches brand, name, extra info, category, material, location, date, price
     if (freeSearch.trim()) {
       const q = freeSearch.toLocaleLowerCase('tr-TR').trim();
+      const brand = (bottle.marka || '').toLocaleLowerCase('tr-TR');
       const name = (bottle.icki_adi || '').toLocaleLowerCase('tr-TR');
+      const details = (bottle.ek_bilgiler || '').toLocaleLowerCase('tr-TR');
       const cat = (bottle.icki_turu || '').toLocaleLowerCase('tr-TR');
       const mat = (bottle.sise_turu || '').toLocaleLowerCase('tr-TR');
       const loc = (bottle.alindigi_yer || '').toLocaleLowerCase('tr-TR');
       const date = (bottle.alinma_tarihi || '').toLocaleLowerCase('tr-TR');
       const price = bottle.fiyat !== null ? String(bottle.fiyat) : '';
 
-      const matchesAny = name.includes(q) || 
-                         cat.includes(q) || 
-                         mat.includes(q) || 
-                         loc.includes(q) || 
-                         date.includes(q) || 
+      const matchesAny = brand.includes(q) ||
+                         name.includes(q) ||
+                         details.includes(q) ||
+                         cat.includes(q) ||
+                         mat.includes(q) ||
+                         loc.includes(q) ||
+                         date.includes(q) ||
                          price.includes(q);
       if (!matchesAny) {
         return false;
       }
     }
 
-    // 3. Category Filter
+    // Category Filter
     if (categoryFilter) {
       if (bottle.icki_turu !== categoryFilter) {
         return false;
       }
     }
 
-    // 4. Material Filter
+    // Material Filter
     if (materialFilter) {
       if (bottle.sise_turu !== materialFilter) {
         return false;
@@ -76,56 +67,28 @@ export default function BottleGrid({ bottles, categories = [], materials = [], o
     return true;
   });
 
-  // Sort bottles
-  const sortedBottles = [...filteredBottles].sort((a, b) => {
-    switch (sortBy) {
-      case 'oldest':
-        return new Date(a.createdAt) - new Date(b.createdAt);
-      case 'alpha_asc':
-        return (a.icki_adi || '').toLocaleLowerCase('tr-TR').localeCompare((b.icki_adi || '').toLocaleLowerCase('tr-TR'), 'tr');
-      case 'alpha_desc':
-        return (b.icki_adi || '').toLocaleLowerCase('tr-TR').localeCompare((a.icki_adi || '').toLocaleLowerCase('tr-TR'), 'tr');
-      case 'price_asc':
-        if (a.fiyat === null) return 1;
-        if (b.fiyat === null) return -1;
-        return a.fiyat - b.fiyat;
-      case 'price_desc':
-        if (a.fiyat === null) return 1;
-        if (b.fiyat === null) return -1;
-        return b.fiyat - a.fiyat;
-      case 'newest':
-      default:
-        return new Date(b.createdAt) - new Date(a.createdAt);
-    }
-  });
-
   return (
     <div>
-      {/* Search and Filters Panel */}
+      {/* Search and Filters Panel - Combined in a single row on desktop */}
       <div className="search-filter-panel">
-        <div className="search-row">
-          <div className="search-input-wrapper">
-            <span className="search-icon">🔍</span>
-            <input 
-              type="text" 
-              placeholder="İsimden hızlı arama..." 
-              value={quickSearch}
-              onChange={(e) => setQuickSearch(e.target.value)}
-            />
+        <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', alignItems: 'flex-end' }}>
+          
+          {/* Serbest Arama (Genel Arama) */}
+          <div className="filter-item" style={{ flex: '2 1 250px' }}>
+            <label>Serbest Arama</label>
+            <div className="search-input-wrapper" style={{ width: '100%' }}>
+              <span className="search-icon">🔎</span>
+              <input 
+                type="text" 
+                placeholder="Marka, isim, kategori, yer vb. ara..." 
+                value={freeSearch}
+                onChange={(e) => setFreeSearch(e.target.value)}
+              />
+            </div>
           </div>
-          <div className="search-input-wrapper">
-            <span className="search-icon">🔎</span>
-            <input 
-              type="text" 
-              placeholder="Serbest Arama (Tüm alanlarda ara...)" 
-              value={freeSearch}
-              onChange={(e) => setFreeSearch(e.target.value)}
-            />
-          </div>
-        </div>
 
-        <div className="filters-row">
-          <div className="filter-item">
+          {/* İçki Türü Filtresi */}
+          <div className="filter-item" style={{ flex: '1 1 150px' }}>
             <label>İçki Türü</label>
             <select value={categoryFilter} onChange={(e) => setCategoryFilter(e.target.value)}>
               <option value="">Tüm Türler</option>
@@ -135,7 +98,8 @@ export default function BottleGrid({ bottles, categories = [], materials = [], o
             </select>
           </div>
 
-          <div className="filter-item">
+          {/* Şişe Türü Filtresi */}
+          <div className="filter-item" style={{ flex: '1 1 150px' }}>
             <label>Şişe Türü (Materyal)</label>
             <select value={materialFilter} onChange={(e) => setMaterialFilter(e.target.value)}>
               <option value="">Tüm Materyaller</option>
@@ -145,20 +109,9 @@ export default function BottleGrid({ bottles, categories = [], materials = [], o
             </select>
           </div>
 
-          <div className="filter-item">
-            <label>Sıralama</label>
-            <select value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
-              <option value="newest">En Yeni Eklenenler</option>
-              <option value="oldest">En Eski Eklenenler</option>
-              <option value="alpha_asc">İsim (A-Z)</option>
-              <option value="alpha_desc">İsim (Z-A)</option>
-              <option value="price_asc">Fiyat (Düşükten Yükseğe)</option>
-              <option value="price_desc">Fiyat (Yüksekten Düşüğe)</option>
-            </select>
-          </div>
-
-          <div className="filter-actions">
-            <button className="btn btn-outline" style={{ height: '43px' }} onClick={clearFilters}>
+          {/* Temizle Butonu */}
+          <div className="filter-actions" style={{ marginBottom: '1px' }}>
+            <button className="btn btn-outline" style={{ height: '45px', padding: '0 1.5rem' }} onClick={clearFilters}>
               Temizle
             </button>
           </div>
@@ -166,9 +119,9 @@ export default function BottleGrid({ bottles, categories = [], materials = [], o
       </div>
 
       {/* Grid Results */}
-      {sortedBottles.length > 0 ? (
+      {filteredBottles.length > 0 ? (
         <div className="bottles-grid">
-          {sortedBottles.map((bottle) => {
+          {filteredBottles.map((bottle) => {
             const hasPhotos = bottle.fotograflar && bottle.fotograflar.length > 0;
             const mainPhoto = hasPhotos ? bottle.fotograflar[0] : null;
 
@@ -206,18 +159,58 @@ export default function BottleGrid({ bottles, categories = [], materials = [], o
                 </div>
 
                 <div className="bottle-info">
-                  <div>
-                    <div className="bottle-meta">
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+                    <div className="bottle-meta" style={{ marginBottom: '0.15rem' }}>
                       <span className="bottle-category">{bottle.icki_turu || 'Diğer'}</span>
                       {bottle.fiyat && (
                         <span className="bottle-price">{formatPrice(bottle.fiyat, bottle.para_birimi)}</span>
                       )}
                     </div>
-                    <h3 className="bottle-name">{bottle.icki_adi}</h3>
+                    
+                    {/* Marka (Brand) */}
+                    {bottle.marka ? (
+                      <div 
+                        style={{ 
+                          fontSize: '0.8rem', 
+                          fontWeight: 600, 
+                          color: 'var(--text-secondary)', 
+                          overflow: 'hidden', 
+                          textOverflow: 'ellipsis', 
+                          whiteSpace: 'nowrap' 
+                        }} 
+                        title={bottle.marka}
+                      >
+                        {bottle.marka}
+                      </div>
+                    ) : (
+                      <div style={{ fontSize: '0.8rem', height: '1rem' }}></div>
+                    )}
+
+                    {/* İçki Adı (Name) */}
+                    <h3 className="bottle-name" style={{ height: '3.1rem', margin: 0 }}>{bottle.icki_adi}</h3>
+                    
+                    {/* Ek Bilgiler (Extra Info) */}
+                    {bottle.ek_bilgiler ? (
+                      <div 
+                        style={{ 
+                          fontSize: '0.72rem', 
+                          color: 'var(--text-muted)', 
+                          overflow: 'hidden', 
+                          textOverflow: 'ellipsis', 
+                          whiteSpace: 'nowrap',
+                          marginTop: '0.25rem'
+                        }} 
+                        title={bottle.ek_bilgiler}
+                      >
+                        {bottle.ek_bilgiler}
+                      </div>
+                    ) : (
+                      <div style={{ fontSize: '0.72rem', height: '0.9rem', marginTop: '0.25rem' }}></div>
+                    )}
                   </div>
                   
                   {bottle.alindigi_yer && (
-                    <div className="bottle-origin">
+                    <div className="bottle-origin" style={{ marginTop: '0.5rem' }}>
                       📍 {bottle.alindigi_yer}
                     </div>
                   )}
@@ -231,7 +224,7 @@ export default function BottleGrid({ bottles, categories = [], materials = [], o
           <div className="empty-state-icon">🥃</div>
           <h3>Şişe Bulunamadı</h3>
           <p>Seçilen filtrelere veya arama kriterlerine uygun kayıt bulunmuyor.</p>
-          {(quickSearch || freeSearch || categoryFilter || materialFilter) && (
+          {(freeSearch || categoryFilter || materialFilter) && (
             <button className="btn btn-outline btn-sm" style={{ marginTop: '1rem' }} onClick={clearFilters}>
               Filtreleri Sıfırla
             </button>

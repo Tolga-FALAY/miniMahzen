@@ -13,7 +13,9 @@ export const initializeDB = () => {
     db.exec(`
         CREATE TABLE IF NOT EXISTS Bottles (
             id TEXT PRIMARY KEY,
+            marka TEXT, -- Brand
             icki_adi TEXT NOT NULL,
+            ek_bilgiler TEXT, -- Extra details
             icki_turu TEXT,
             sise_turu TEXT,
             fotograflar TEXT, -- Stored as JSON array of base64 images
@@ -65,16 +67,27 @@ export const initializeDB = () => {
         defaults.forEach(cur => insertCur.run(cur));
     }
 
-    // Migration for adding para_birimi column dynamically if it does not exist
+    // Migration for adding column dynamically if they do not exist
     try {
         const tableInfo = db.prepare("PRAGMA table_info(Bottles)").all();
         const existingCols = tableInfo.map(col => col.name);
+        
         if (!existingCols.includes('para_birimi')) {
             console.log("Migrating database: Adding column para_birimi to Bottles table...");
             db.exec("ALTER TABLE Bottles ADD COLUMN para_birimi TEXT DEFAULT 'TL';");
         }
+        
+        if (!existingCols.includes('marka')) {
+            console.log("Migrating database: Adding column marka to Bottles table...");
+            db.exec("ALTER TABLE Bottles ADD COLUMN marka TEXT;");
+        }
+        
+        if (!existingCols.includes('ek_bilgiler')) {
+            console.log("Migrating database: Adding column ek_bilgiler to Bottles table...");
+            db.exec("ALTER TABLE Bottles ADD COLUMN ek_bilgiler TEXT;");
+        }
     } catch (e) {
-        console.error("Migration error while adding para_birimi to Bottles table:", e);
+        console.error("Migration error while updating Bottles table:", e);
     }
 
     console.log("Database initialized. Bottles and parameters tables are ready.");

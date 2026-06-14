@@ -3,7 +3,9 @@ import { api } from '../api';
 
 export default function BottleForm({ bottle, onClose, onSave }) {
   const [formData, setFormData] = useState({
+    marka: '',
     icki_adi: '',
+    ek_bilgiler: '',
     icki_turu: '',
     sise_turu: '',
     fotograflar: [],
@@ -45,7 +47,9 @@ export default function BottleForm({ bottle, onClose, onSave }) {
   useEffect(() => {
     if (bottle) {
       setFormData({
+        marka: bottle.marka || '',
         icki_adi: bottle.icki_adi || '',
+        ek_bilgiler: bottle.ek_bilgiler || '',
         icki_turu: bottle.icki_turu || '',
         sise_turu: bottle.sise_turu || '',
         fotograflar: bottle.fotograflar || [],
@@ -193,7 +197,19 @@ export default function BottleForm({ bottle, onClose, onSave }) {
         <div className="modal-body" style={{ overflowY: 'auto', flexGrow: 1 }}>
           {error && <div style={{ color: 'var(--danger)', marginBottom: '1rem', fontWeight: 600, fontSize: '0.9rem' }}>{error}</div>}
 
-          {/* Zorunlu Alanlar */}
+          {/* Temel Alanlar */}
+          <div className="form-group">
+            <label>Marka</label>
+            <input 
+              type="text" 
+              name="marka" 
+              value={formData.marka} 
+              onChange={handleChange} 
+              placeholder="Örn: Drumshanbo, Hendrick's, Jack Daniel's" 
+              disabled={loading}
+            />
+          </div>
+
           <div className="form-group">
             <label>İçki Adı <span className="required">*</span></label>
             <input 
@@ -201,8 +217,20 @@ export default function BottleForm({ bottle, onClose, onSave }) {
               name="icki_adi" 
               value={formData.icki_adi} 
               onChange={handleChange} 
-              placeholder="Örn: Hendrick's Gin, Jägermeister" 
+              placeholder="Örn: Gunpowder Irish Gin, Single Barrel Select" 
               required 
+              disabled={loading}
+            />
+          </div>
+
+          <div className="form-group">
+            <label>Ek Bilgiler</label>
+            <input 
+              type="text" 
+              name="ek_bilgiler" 
+              value={formData.ek_bilgiler} 
+              onChange={handleChange} 
+              placeholder="Örn: with Californian Orange Citrus, Sherry Cask Finish" 
               disabled={loading}
             />
           </div>
