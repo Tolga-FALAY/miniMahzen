@@ -145,7 +145,7 @@ export default function BottleGrid({ bottles, categories = [], materials = [], o
                       flexDirection: 'column',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      background: '#09090b',
+                      background: 'var(--bg-main)',
                       color: 'var(--text-muted)'
                     }}>
                       <span style={{ fontSize: '2.5rem' }}>🥃</span>

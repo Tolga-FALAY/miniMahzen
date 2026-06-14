@@ -55,7 +55,7 @@ export default function BottleDetail({ bottle, onClose, onEdit, onDelete }) {
                     flexDirection: 'column',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    background: '#09090b',
+                    background: 'var(--bg-main)',
                     color: 'var(--text-muted)'
                   }}>
                     <span style={{ fontSize: '3rem' }}>🥃</span>
