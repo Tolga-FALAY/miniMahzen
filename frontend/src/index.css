@@ -117,9 +117,24 @@
   }
   
   .app-logo span.logo-icon {
-    font-size: 2.25rem;
-    filter: drop-shadow(0 0 10px rgba(2, 132, 199, 0.4));
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    font-size: 1.6rem;
+    background: linear-gradient(135deg, #ffffff 0%, #e0f2fe 100%);
+    border: 1.5px solid #0ea5e9;
+    border-radius: var(--radius-md);
+    box-shadow: 0 4px 10px rgba(2, 132, 199, 0.15), 0 0 0 3px rgba(14, 165, 233, 0.1);
     animation: float-icon 4s ease-in-out infinite;
+    transition: all var(--transition-fast);
+  }
+  
+  .app-logo:hover span.logo-icon {
+    transform: rotate(8deg) scale(1.05);
+    border-color: #8b5cf6;
+    box-shadow: 0 6px 14px rgba(139, 92, 246, 0.25), 0 0 0 4px rgba(139, 92, 246, 0.15);
   }
   
   @keyframes float-icon {
@@ -131,9 +146,18 @@
     font-size: 1.75rem;
     font-weight: 800;
     letter-spacing: -0.5px;
-    background: linear-gradient(135deg, var(--text-main) 60%, var(--primary) 100%);
+    background: linear-gradient(135deg, var(--text-main) 52%, #8b5cf6 78%, #0284c7 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
+  }
+
+  .btn-plus-icon {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #ffffff !important;
+    margin-right: 4px;
+    line-height: 1;
+    display: inline-block;
   }
   
   .header-actions {

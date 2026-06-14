@@ -105,7 +105,7 @@ export default function App() {
             className="btn btn-primary"
             onClick={() => { setEditingBottle(null); setIsFormOpen(true); }}
           >
-            ➕ Yeni Şişe Ekle
+            <span className="btn-plus-icon">+</span> Yeni Şişe Ekle
           </button>
         </div>
       </header>

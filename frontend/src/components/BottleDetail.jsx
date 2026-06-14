@@ -85,7 +85,20 @@ export default function BottleDetail({ bottle, onClose, onEdit, onDelete }) {
               <div className="detail-header-group">
                 <div className="detail-category">{icki_turu || 'Diğer'}</div>
                 <h3 className="detail-title">{icki_adi}</h3>
-                {ek_bilgiler && <div style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', marginTop: '0.5rem', lineHeight: '1.4' }}>{ek_bilgiler}</div>}
+              </div>
+
+              {/* Ek Bilgiler (Şişe türü ve fiyat maliyet alanının üzerinde) */}
+              <div className="detail-description-section" style={{
+                background: 'var(--bg-main)',
+                padding: '0.85rem 1rem',
+                borderRadius: 'var(--radius-md)',
+                border: '1px solid var(--border-color)',
+                marginBottom: '0.5rem'
+              }}>
+                <span className="field-label" style={{ display: 'block', fontSize: '0.7rem', fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '0.25rem' }}>Ek Bilgiler</span>
+                <span className="field-value" style={{ fontSize: '0.92rem', fontWeight: 600, color: 'var(--text-main)', wordBreak: 'break-word' }}>
+                  {ek_bilgiler || 'Belirtilmemiş'}
+                </span>
               </div>
 
               <div className="detail-fields-grid">
