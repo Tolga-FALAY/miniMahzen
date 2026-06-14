@@ -15,53 +15,53 @@ export default function WhiskeyLogo({ size = 28, showGlow = false, className = "
         <circle cx="32" cy="32" r="28" fill="url(#glassGlow)" opacity="0.15"/>
       )}
       
-      {/* Liquid (Whiskey) */}
+      {/* Liquid (Whiskey) inside straight glass walls */}
       <path 
-        d="M19.5,32 C19.5,32 32,35 44.5,32 L42,50 C42,52 38,53.5 32,53.5 C26,53.5 22,52 22,50 Z" 
+        d="M14.25,28 C14.25,28 32,30.5 49.75,28 L48.8,44 C48.8,46 38,47.2 32,47.2 C26,47.2 15.2,46 15.2,44 Z" 
         fill="url(#whiskeyGrad)" 
       />
-      <ellipse cx="32" cy="32.5" rx="12.5" ry="1.5" fill="rgba(255, 255, 255, 0.3)" />
+      <ellipse cx="32" cy="28.5" rx="14.5" ry="1.2" fill="rgba(255, 255, 255, 0.25)" />
 
       {/* Ice Cube 1 (Lower Right, partially submerged) */}
-      <g transform="rotate(12 34 36)">
-        <rect x="29" y="31" width="10" height="10" rx="2" fill="rgba(255, 255, 255, 0.2)" stroke="rgba(255, 255, 255, 0.6)" strokeWidth="1"/>
-        <path d="M30,32 L38,32" stroke="rgba(255,255,255,0.8)" strokeWidth="0.8" strokeLinecap="round"/>
-        <path d="M30,32 L30,40" stroke="rgba(255,255,255,0.8)" strokeWidth="0.8" strokeLinecap="round"/>
+      <g transform="rotate(15 36 34)">
+        <rect x="30" y="28" width="13" height="13" rx="2" fill="rgba(255, 255, 255, 0.2)" stroke="rgba(255, 255, 255, 0.65)" strokeWidth="0.8"/>
+        <path d="M31,29 L41,29" stroke="rgba(255,255,255,0.7)" strokeWidth="0.7" strokeLinecap="round"/>
+        <path d="M31,29 L31,39" stroke="rgba(255,255,255,0.7)" strokeWidth="0.7" strokeLinecap="round"/>
       </g>
 
       {/* Ice Cube 2 (Upper Left, floating higher) */}
-      <g transform="rotate(-15 26 28)">
-        <rect x="21" y="23" width="11" height="11" rx="2" fill="rgba(255, 255, 255, 0.25)" stroke="rgba(255, 255, 255, 0.7)" strokeWidth="1"/>
-        <path d="M22,24 L31,24" stroke="rgba(255,255,255,0.85)" strokeWidth="0.8" strokeLinecap="round"/>
-        <path d="M22,24 L22,33" stroke="rgba(255,255,255,0.85)" strokeWidth="0.8" strokeLinecap="round"/>
+      <g transform="rotate(-12 25 24)">
+        <rect x="18" y="18" width="14" height="14" rx="2.5" fill="rgba(255, 255, 255, 0.25)" stroke="rgba(255, 255, 255, 0.75)" strokeWidth="0.8"/>
+        <path d="M19.5,19.5 L30.5,19.5" stroke="rgba(255,255,255,0.8)" strokeWidth="0.7" strokeLinecap="round"/>
+        <path d="M19.5,19.5 L19.5,30.5" stroke="rgba(255,255,255,0.8)" strokeWidth="0.7" strokeLinecap="round"/>
       </g>
 
-      {/* Glass Tumbler Outlines & Shading */}
-      <ellipse cx="32" cy="14" rx="16" ry="2" stroke="url(#glassGrad)" strokeWidth="1.5" />
+      {/* Straight Glass Outlines (Classic Old Fashioned Rocks Glass) */}
+      <ellipse cx="32" cy="12" rx="20" ry="2.2" stroke="url(#glassGrad)" strokeWidth="1.5" />
       <path 
-        d="M16,14 C16,14 18,48 20,51 C21.5,53.5 25,55 32,55 C39,55 42.5,53.5 44,51 C46,48 48,14 48,14" 
+        d="M12,12 L12,52 C12,54.5 16,56 32,56 C48,56 52,54.5 52,52 L52,12" 
         stroke="url(#glassGrad)" 
-        strokeWidth="2" 
+        strokeWidth="2.2" 
         strokeLinecap="round" 
         strokeLinejoin="round"
       />
       
-      {/* Thick Glass Base highlight */}
+      {/* Thick Glass Base sham shading/reflection */}
       <path 
-        d="M20.8,47 C20.8,47 25,50.5 32,50.5 C39,50.5 43.2,47 43.2,47 C43.2,47 42.5,52 41,53.2 C39.5,54.2 36,54.5 32,54.5 C28,54.5 24.5,54.2 23,53.2 C21.5,52 20.8,47 20.8,47 Z" 
-        fill="rgba(255, 255, 255, 0.15)" 
+        d="M12.8,44.5 C12.8,44.5 18,48 32,48 C46,48 51.2,44.5 51.2,44.5 C51.2,44.5 50.5,51.5 47,53.5 C43.5,55.2 37,55.5 32,55.5 C27,55.5 20.5,55.2 17,53.5 C13.5,51.5 12.8,44.5 12.8,44.5 Z" 
+        fill="rgba(255, 255, 255, 0.18)" 
         stroke="url(#glassGrad)" 
         strokeWidth="0.8"
       />
       
       {/* Left Glass Highlight */}
-      <path d="M18.5,18 C18.5,18 20.5,38 21,48" stroke="rgba(255,255,255,0.6)" strokeWidth="1.2" strokeLinecap="round"/>
+      <path d="M15,16 L15,42" stroke="rgba(255,255,255,0.65)" strokeWidth="1.5" strokeLinecap="round"/>
       
       {/* Right Glass Highlight */}
-      <path d="M45.5,20 C45.5,20 43.8,36 43,46" stroke="rgba(255,255,255,0.3)" strokeWidth="0.8" strokeLinecap="round"/>
+      <path d="M49,18 L49,42" stroke="rgba(255,255,255,0.3)" strokeWidth="0.8" strokeLinecap="round"/>
 
-      {/* Liquid Surface line */}
-      <path d="M19.5,32 C25,33.5 39,33.5 44.5,32" stroke="rgba(255, 255, 255, 0.4)" strokeWidth="1" strokeLinecap="round"/>
+      {/* Liquid Surface Meniscus line */}
+      <path d="M14.25,28 C20,30.5 44,30.5 49.75,28" stroke="rgba(255, 255, 255, 0.45)" strokeWidth="1.2" strokeLinecap="round"/>
 
       <defs>
         <linearGradient id="whiskeyGrad" x1="0%" y1="0%" x2="0%" y2="100%">

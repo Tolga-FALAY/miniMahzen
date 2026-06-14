@@ -68,6 +68,13 @@ export default function BottleGrid({ bottles, categories = [], materials = [], o
     return true;
   });
 
+  // Sort bottles alphabetically by icki_adi (Drink Name) using Turkish locale
+  const sortedBottles = [...filteredBottles].sort((a, b) => {
+    const nameA = a.icki_adi || '';
+    const nameB = b.icki_adi || '';
+    return nameA.localeCompare(nameB, 'tr', { sensitivity: 'base', numeric: true });
+  });
+
   return (
     <div>
       {/* Search and Filters Panel - Combined in a single row on desktop */}
@@ -120,9 +127,9 @@ export default function BottleGrid({ bottles, categories = [], materials = [], o
       </div>
 
       {/* Grid Results */}
-      {filteredBottles.length > 0 ? (
+      {sortedBottles.length > 0 ? (
         <div className="bottles-grid">
-          {filteredBottles.map((bottle) => {
+          {sortedBottles.map((bottle) => {
             const hasPhotos = bottle.fotograflar && bottle.fotograflar.length > 0;
             const mainPhoto = hasPhotos ? bottle.fotograflar[0] : null;
 
@@ -149,7 +156,7 @@ export default function BottleGrid({ bottles, categories = [], materials = [], o
                       background: 'var(--bg-main)',
                       color: 'var(--text-muted)'
                     }}>
-                      <WhiskeyLogo size={44} showGlow={true} />
+                      <WhiskeyLogo size={96} showGlow={true} />
                       <span style={{ fontSize: '0.65rem', marginTop: '0.5rem', fontWeight: 700 }}>RESİM YOK</span>
                     </div>
                   )}
@@ -195,7 +202,7 @@ export default function BottleGrid({ bottles, categories = [], materials = [], o
       ) : (
         <div className="empty-state">
           <div className="empty-state-icon" style={{ display: 'flex', justifyContent: 'center', opacity: 0.6 }}>
-            <WhiskeyLogo size={64} showGlow={true} />
+            <WhiskeyLogo size={120} showGlow={true} />
           </div>
           <h3>Şişe Bulunamadı</h3>
           <p>Seçilen filtrelere veya arama kriterlerine uygun kayıt bulunmuyor.</p>

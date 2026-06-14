@@ -93,7 +93,7 @@ export default function App() {
       <header className="app-header">
         <a href="/" className="app-logo" onClick={(e) => { e.preventDefault(); loadBottles(); }}>
           <span className="logo-icon">
-            <WhiskeyLogo size={32} showGlow={true} />
+            <WhiskeyLogo size={38} showGlow={true} />
           </span>
           <h1>Mini Mahzen</h1>
         </a>
