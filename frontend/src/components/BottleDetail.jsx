@@ -84,7 +84,6 @@ export default function BottleDetail({ bottle, onClose, onEdit, onDelete }) {
             <div className="detail-info">
               <div className="detail-header-group">
                 <div className="detail-category">{icki_turu || 'Diğer'}</div>
-                {marka && <div style={{ fontSize: '1.15rem', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '0.25rem' }}>{marka}</div>}
                 <h3 className="detail-title">{icki_adi}</h3>
                 {ek_bilgiler && <div style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', marginTop: '0.5rem', lineHeight: '1.4' }}>{ek_bilgiler}</div>}
               </div>

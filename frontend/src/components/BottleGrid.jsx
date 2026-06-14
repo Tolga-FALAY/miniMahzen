@@ -131,10 +131,6 @@ export default function BottleGrid({ bottles, categories = [], materials = [], o
                 className="bottle-card"
                 onClick={() => onSelectBottle(bottle)}
               >
-                {bottle.sise_turu && (
-                  <span className="bottle-type-badge">{bottle.sise_turu}</span>
-                )}
-                
                 <div className="bottle-image-container">
                   {mainPhoto ? (
                     <img src={mainPhoto} alt={bottle.icki_adi} loading="lazy" />
@@ -162,30 +158,8 @@ export default function BottleGrid({ bottles, categories = [], materials = [], o
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
                     <div className="bottle-meta" style={{ marginBottom: '0.15rem' }}>
                       <span className="bottle-category">{bottle.icki_turu || 'Diğer'}</span>
-                      {bottle.fiyat && (
-                        <span className="bottle-price">{formatPrice(bottle.fiyat, bottle.para_birimi)}</span>
-                      )}
                     </div>
                     
-                    {/* Marka (Brand) */}
-                    {bottle.marka ? (
-                      <div 
-                        style={{ 
-                          fontSize: '0.8rem', 
-                          fontWeight: 600, 
-                          color: 'var(--text-secondary)', 
-                          overflow: 'hidden', 
-                          textOverflow: 'ellipsis', 
-                          whiteSpace: 'nowrap' 
-                        }} 
-                        title={bottle.marka}
-                      >
-                        {bottle.marka}
-                      </div>
-                    ) : (
-                      <div style={{ fontSize: '0.8rem', height: '1rem' }}></div>
-                    )}
-
                     {/* İçki Adı (Name) */}
                     <h3 className="bottle-name" style={{ height: '3.1rem', margin: 0 }}>{bottle.icki_adi}</h3>
                     

@@ -169,6 +169,7 @@ export default function BottleForm({ bottle, onClose, onSave }) {
     try {
       const payload = {
         ...formData,
+        marka: null, // Merged into icki_adi
         fiyat: formData.fiyat !== '' ? Number(formData.fiyat) : null
       };
 
@@ -199,25 +200,13 @@ export default function BottleForm({ bottle, onClose, onSave }) {
 
           {/* Temel Alanlar */}
           <div className="form-group">
-            <label>Marka</label>
-            <input 
-              type="text" 
-              name="marka" 
-              value={formData.marka} 
-              onChange={handleChange} 
-              placeholder="Örn: Drumshanbo, Hendrick's, Jack Daniel's" 
-              disabled={loading}
-            />
-          </div>
-
-          <div className="form-group">
-            <label>İçki Adı <span className="required">*</span></label>
+            <label>Marka / İçki Adı <span className="required">*</span></label>
             <input 
               type="text" 
               name="icki_adi" 
               value={formData.icki_adi} 
               onChange={handleChange} 
-              placeholder="Örn: Gunpowder Irish Gin, Single Barrel Select" 
+              placeholder="Örn: Drum Shanbo Gunpowder Irish Gin" 
               required 
               disabled={loading}
             />
