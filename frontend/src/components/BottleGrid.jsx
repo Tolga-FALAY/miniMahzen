@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import WhiskeyLogo from './WhiskeyLogo';
 
 export default function BottleGrid({ bottles, categories = [], materials = [], onSelectBottle }) {
   const [freeSearch, setFreeSearch] = useState('');
@@ -148,7 +149,7 @@ export default function BottleGrid({ bottles, categories = [], materials = [], o
                       background: 'var(--bg-main)',
                       color: 'var(--text-muted)'
                     }}>
-                      <span style={{ fontSize: '2.5rem' }}>🥃</span>
+                      <WhiskeyLogo size={44} showGlow={true} />
                       <span style={{ fontSize: '0.65rem', marginTop: '0.5rem', fontWeight: 700 }}>RESİM YOK</span>
                     </div>
                   )}
@@ -161,10 +162,10 @@ export default function BottleGrid({ bottles, categories = [], materials = [], o
                     </div>
                     
                     {/* İçki Adı (Name) */}
-                    <h3 className="bottle-name" style={{ height: '3.1rem', margin: 0 }}>{bottle.icki_adi}</h3>
+                    <h3 className="bottle-name" style={{ margin: 0 }}>{bottle.icki_adi}</h3>
                     
                     {/* Ek Bilgiler (Extra Info) */}
-                    {bottle.ek_bilgiler ? (
+                    {bottle.ek_bilgiler && (
                       <div 
                         style={{ 
                           fontSize: '0.72rem', 
@@ -178,8 +179,6 @@ export default function BottleGrid({ bottles, categories = [], materials = [], o
                       >
                         {bottle.ek_bilgiler}
                       </div>
-                    ) : (
-                      <div style={{ fontSize: '0.72rem', height: '0.9rem', marginTop: '0.25rem' }}></div>
                     )}
                   </div>
                   
@@ -195,7 +194,9 @@ export default function BottleGrid({ bottles, categories = [], materials = [], o
         </div>
       ) : (
         <div className="empty-state">
-          <div className="empty-state-icon">🥃</div>
+          <div className="empty-state-icon" style={{ display: 'flex', justifyContent: 'center', opacity: 0.6 }}>
+            <WhiskeyLogo size={64} showGlow={true} />
+          </div>
           <h3>Şişe Bulunamadı</h3>
           <p>Seçilen filtrelere veya arama kriterlerine uygun kayıt bulunmuyor.</p>
           {(freeSearch || categoryFilter || materialFilter) && (

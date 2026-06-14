@@ -4,6 +4,7 @@ import BottleGrid from './components/BottleGrid';
 import BottleDetail from './components/BottleDetail';
 import BottleForm from './components/BottleForm';
 import ParameterManager from './components/ParameterManager';
+import WhiskeyLogo from './components/WhiskeyLogo';
 
 export default function App() {
   const [bottles, setBottles] = useState([]);
@@ -91,7 +92,9 @@ export default function App() {
       {/* Header */}
       <header className="app-header">
         <a href="/" className="app-logo" onClick={(e) => { e.preventDefault(); loadBottles(); }}>
-          <span className="logo-icon">🥃</span>
+          <span className="logo-icon">
+            <WhiskeyLogo size={32} showGlow={true} />
+          </span>
           <h1>Mini Mahzen</h1>
         </a>
         <div className="header-actions">

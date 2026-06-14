@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import WhiskeyLogo from './WhiskeyLogo';
 
 export default function BottleDetail({ bottle, onClose, onEdit, onDelete }) {
   const [activePhotoIndex, setActivePhotoIndex] = useState(0);
@@ -58,7 +59,7 @@ export default function BottleDetail({ bottle, onClose, onEdit, onDelete }) {
                     background: 'var(--bg-main)',
                     color: 'var(--text-muted)'
                   }}>
-                    <span style={{ fontSize: '3rem' }}>🥃</span>
+                    <WhiskeyLogo size={56} showGlow={true} />
                     <span style={{ fontSize: '0.8rem', marginTop: '0.5rem', fontWeight: 600 }}>FOTOĞRAF YOK</span>
                   </div>
                 )}
