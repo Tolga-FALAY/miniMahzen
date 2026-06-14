@@ -71,7 +71,7 @@ export default function BottleGrid({ bottles, categories = [], materials = [], o
     <div>
       {/* Search and Filters Panel - Combined in a single row on desktop */}
       <div className="search-filter-panel">
-        <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', alignItems: 'flex-end' }}>
+        <div className="filters-row">
           
           {/* Serbest Arama (Genel Arama) */}
           <div className="filter-item" style={{ flex: '2 1 250px' }}>

@@ -203,6 +203,7 @@ export default function ParameterManager({ onClose, onUpdate }) {
           <form onSubmit={handleAdd} style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.5rem' }}>
             <input 
               type="text" 
+              className="parameter-input"
               placeholder={activeTab === 'currencies' ? 'Örn: EUR, USD' : 'Yeni ekle...'} 
               value={newValue}
               onChange={(e) => setNewValue(e.target.value)}
@@ -242,6 +243,7 @@ export default function ParameterManager({ onClose, onUpdate }) {
                       <div style={{ display: 'flex', gap: '0.5rem', width: '100%' }}>
                         <input 
                           type="text" 
+                          className="parameter-input"
                           value={editingValue}
                           onChange={(e) => setEditingValue(e.target.value)}
                           style={{ flex: 1, padding: '0.4rem 0.75rem', fontSize: '0.9rem' }}
