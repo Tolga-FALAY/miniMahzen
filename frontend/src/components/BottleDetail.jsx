@@ -4,11 +4,108 @@ import WhiskeyLogo from './WhiskeyLogo';
 export default function BottleDetail({ bottle, onClose, onEdit, onDelete }) {
   const [activePhotoIndex, setActivePhotoIndex] = useState(0);
   const [isFullscreenOpen, setIsFullscreenOpen] = useState(false);
+  const [zoomScale, setZoomScale] = useState(1);
+  const [zoomPosition, setZoomPosition] = useState({ x: 0, y: 0 });
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+
+  const overlayRef = React.useRef(null);
+  const touchStateRef = React.useRef({ initialDist: 0, initialScale: 1 });
 
   if (!bottle) return null;
 
   const { id, marka, icki_adi, ek_bilgiler, icki_turu, sise_turu, fotograflar, alinma_tarihi, alindigi_yer, fiyat, para_birimi } = bottle;
   const hasPhotos = fotograflar && fotograflar.length > 0;
+
+  const resetZoom = () => {
+    setZoomScale(1);
+    setZoomPosition({ x: 0, y: 0 });
+  };
+
+  useEffect(() => {
+    resetZoom();
+  }, [activePhotoIndex, isFullscreenOpen]);
+
+  useEffect(() => {
+    const overlayElement = overlayRef.current;
+    if (!overlayElement || !isFullscreenOpen) return;
+
+    const handleWheel = (e) => {
+      if (e.ctrlKey) {
+        e.preventDefault();
+        const zoomIntensity = 0.05;
+        const delta = -e.deltaY;
+        setZoomScale((prevScale) => {
+          const newScale = Math.max(1, Math.min(5, prevScale + delta * zoomIntensity * 0.1));
+          return newScale;
+        });
+      }
+    };
+
+    overlayElement.addEventListener('wheel', handleWheel, { passive: false });
+    return () => {
+      overlayElement.removeEventListener('wheel', handleWheel);
+    };
+  }, [isFullscreenOpen]);
+
+  const handleMouseDown = (e) => {
+    if (zoomScale <= 1) return;
+    setIsDragging(true);
+    setDragStart({ x: e.clientX - zoomPosition.x, y: e.clientY - zoomPosition.y });
+  };
+
+  const handleMouseMove = (e) => {
+    if (!isDragging) return;
+    setZoomPosition({
+      x: e.clientX - dragStart.x,
+      y: e.clientY - dragStart.y,
+    });
+  };
+
+  const handleMouseUp = () => {
+    setIsDragging(false);
+  };
+
+  const handleTouchStart = (e) => {
+    if (e.touches.length === 1 && zoomScale > 1) {
+      setIsDragging(true);
+      const touch = e.touches[0];
+      setDragStart({ x: touch.clientX - zoomPosition.x, y: touch.clientY - zoomPosition.y });
+    } else if (e.touches.length === 2) {
+      setIsDragging(false);
+      const touch1 = e.touches[0];
+      const touch2 = e.touches[1];
+      const dist = Math.hypot(touch1.clientX - touch2.clientX, touch1.clientY - touch2.clientY);
+      touchStateRef.current = {
+        initialDist: dist,
+        initialScale: zoomScale,
+      };
+    }
+  };
+
+  const handleTouchMove = (e) => {
+    if (e.touches.length === 1 && isDragging && zoomScale > 1) {
+      const touch = e.touches[0];
+      setZoomPosition({
+        x: touch.clientX - dragStart.x,
+        y: touch.clientY - dragStart.y
+      });
+    } else if (e.touches.length === 2) {
+      const touch1 = e.touches[0];
+      const touch2 = e.touches[1];
+      const dist = Math.hypot(touch1.clientX - touch2.clientX, touch1.clientY - touch2.clientY);
+      const { initialDist, initialScale } = touchStateRef.current;
+      if (initialDist > 0) {
+        const factor = dist / initialDist;
+        const newScale = Math.max(1, Math.min(5, initialScale * factor));
+        setZoomScale(newScale);
+      }
+    }
+  };
+
+  const handleTouchEnd = () => {
+    setIsDragging(false);
+  };
 
   useEffect(() => {
     if (!isFullscreenOpen) return;
@@ -184,7 +281,11 @@ export default function BottleDetail({ bottle, onClose, onEdit, onDelete }) {
       </div>
 
       {isFullscreenOpen && hasPhotos && (
-        <div className="fullscreen-image-overlay" onClick={() => setIsFullscreenOpen(false)}>
+        <div 
+          className="fullscreen-image-overlay" 
+          ref={overlayRef} 
+          onClick={() => setIsFullscreenOpen(false)}
+        >
           <button 
             className="fullscreen-close-btn" 
             onClick={(e) => {
@@ -209,8 +310,66 @@ export default function BottleDetail({ bottle, onClose, onEdit, onDelete }) {
             </button>
           )}
 
-          <div className="fullscreen-image-container" onClick={(e) => e.stopPropagation()}>
-            <img src={fotograflar[activePhotoIndex]} alt={icki_adi} className="fullscreen-image" />
+          <div 
+            className="fullscreen-image-container" 
+            onClick={(e) => e.stopPropagation()}
+            onMouseDown={handleMouseDown}
+            onMouseMove={handleMouseMove}
+            onMouseUp={handleMouseUp}
+            onMouseLeave={handleMouseUp}
+            onTouchStart={handleTouchStart}
+            onTouchMove={handleTouchMove}
+            onTouchEnd={handleTouchEnd}
+            style={{
+              cursor: zoomScale > 1 ? (isDragging ? 'grabbing' : 'grab') : 'default',
+            }}
+          >
+            <img 
+              src={fotograflar[activePhotoIndex]} 
+              alt={icki_adi} 
+              className="fullscreen-image" 
+              style={{
+                transform: `translate(${zoomPosition.x}px, ${zoomPosition.y}px) scale(${zoomScale})`,
+                transition: isDragging ? 'none' : 'transform 0.15s ease-out',
+                transformOrigin: 'center center',
+              }}
+              draggable={false}
+            />
+          </div>
+
+          <div className="fullscreen-zoom-controls" onClick={(e) => e.stopPropagation()}>
+            <button 
+              className="zoom-btn" 
+              onClick={() => {
+                setZoomScale((prev) => Math.min(5, prev + 0.25));
+              }}
+              title="Yakınlaştır"
+            >
+              ➕
+            </button>
+            <span className="zoom-text">{Math.round(zoomScale * 100)}%</span>
+            <button 
+              className="zoom-btn" 
+              onClick={() => {
+                setZoomScale((prev) => {
+                  const s = Math.max(1, prev - 0.25);
+                  if (s === 1) setZoomPosition({ x: 0, y: 0 });
+                  return s;
+                });
+              }}
+              title="Uzaklaştır"
+            >
+              ➖
+            </button>
+            {zoomScale > 1 && (
+              <button 
+                className="zoom-btn reset-btn" 
+                onClick={resetZoom}
+                title="Sıfırla"
+              >
+                ⟲
+              </button>
+            )}
           </div>
 
           {fotograflar.length > 1 && (
