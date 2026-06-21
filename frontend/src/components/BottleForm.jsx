@@ -250,13 +250,33 @@ export default function BottleForm({ bottle, onClose, onSave }) {
           <div className="form-group-row">
             <div className="form-group">
               <label>Satın Alım/Hediye Tarihi</label>
-              <input 
-                type="date" 
-                name="alinma_tarihi" 
-                value={formData.alinma_tarihi} 
-                onChange={handleChange} 
-                disabled={loading}
-              />
+              <div style={{ display: 'flex', gap: '0.5rem' }}>
+                <input 
+                  type="date" 
+                  name="alinma_tarihi" 
+                  value={formData.alinma_tarihi} 
+                  onChange={handleChange} 
+                  disabled={loading}
+                  style={{ flex: 1 }}
+                />
+                <button
+                  type="button"
+                  className="btn btn-outline"
+                  onClick={() => setFormData({ ...formData, alinma_tarihi: '' })}
+                  style={{ 
+                    width: '90px', 
+                    padding: '0 0.5rem', 
+                    fontSize: '0.85rem',
+                    borderColor: 'var(--border-color)',
+                    color: formData.alinma_tarihi ? 'var(--danger)' : 'var(--text-muted)',
+                    cursor: formData.alinma_tarihi ? 'pointer' : 'default',
+                    opacity: formData.alinma_tarihi ? 1 : 0.5
+                  }}
+                  disabled={loading || !formData.alinma_tarihi}
+                >
+                  Temizle
+                </button>
+              </div>
             </div>
 
             <div className="form-group">
