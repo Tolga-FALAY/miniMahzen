@@ -1,13 +1,37 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import WhiskeyLogo from './WhiskeyLogo';
 
 export default function BottleDetail({ bottle, onClose, onEdit, onDelete }) {
   const [activePhotoIndex, setActivePhotoIndex] = useState(0);
+  const [isFullscreenOpen, setIsFullscreenOpen] = useState(false);
 
   if (!bottle) return null;
 
   const { id, marka, icki_adi, ek_bilgiler, icki_turu, sise_turu, fotograflar, alinma_tarihi, alindigi_yer, fiyat, para_birimi } = bottle;
   const hasPhotos = fotograflar && fotograflar.length > 0;
+
+  useEffect(() => {
+    if (!isFullscreenOpen) return;
+
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        setIsFullscreenOpen(false);
+      } else if (e.key === 'ArrowLeft') {
+        if (hasPhotos && fotograflar.length > 1) {
+          setActivePhotoIndex((prev) => (prev === 0 ? fotograflar.length - 1 : prev - 1));
+        }
+      } else if (e.key === 'ArrowRight') {
+        if (hasPhotos && fotograflar.length > 1) {
+          setActivePhotoIndex((prev) => (prev === fotograflar.length - 1 ? 0 : prev + 1));
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isFullscreenOpen, hasPhotos, fotograflar]);
   
   // Format price
   const formatPrice = (val, currencyCode) => {
@@ -45,7 +69,15 @@ export default function BottleDetail({ bottle, onClose, onEdit, onDelete }) {
           <div className="detail-layout">
             {/* Sol Taraf: Görsel Galerisi */}
             <div className="detail-gallery">
-              <div className="detail-main-image">
+              <div 
+                className="detail-main-image"
+                style={{ cursor: hasPhotos ? 'pointer' : 'default' }}
+                onClick={() => {
+                  if (hasPhotos) {
+                    setIsFullscreenOpen(true);
+                  }
+                }}
+              >
                 {hasPhotos ? (
                   <img src={fotograflar[activePhotoIndex]} alt={icki_adi} />
                 ) : (
@@ -150,6 +182,51 @@ export default function BottleDetail({ bottle, onClose, onEdit, onDelete }) {
           </div>
         </div>
       </div>
+
+      {isFullscreenOpen && hasPhotos && (
+        <div className="fullscreen-image-overlay" onClick={() => setIsFullscreenOpen(false)}>
+          <button 
+            className="fullscreen-close-btn" 
+            onClick={(e) => {
+              e.stopPropagation();
+              setIsFullscreenOpen(false);
+            }}
+            title="Kapat (ESC)"
+          >
+            &times;
+          </button>
+          
+          {fotograflar.length > 1 && (
+            <button 
+              className="fullscreen-nav-btn prev-btn" 
+              onClick={(e) => {
+                e.stopPropagation();
+                setActivePhotoIndex((prev) => (prev === 0 ? fotograflar.length - 1 : prev - 1));
+              }}
+              title="Önceki Görsel"
+            >
+              &#10094;
+            </button>
+          )}
+
+          <div className="fullscreen-image-container" onClick={(e) => e.stopPropagation()}>
+            <img src={fotograflar[activePhotoIndex]} alt={icki_adi} className="fullscreen-image" />
+          </div>
+
+          {fotograflar.length > 1 && (
+            <button 
+              className="fullscreen-nav-btn next-btn" 
+              onClick={(e) => {
+                e.stopPropagation();
+                setActivePhotoIndex((prev) => (prev === fotograflar.length - 1 ? 0 : prev + 1));
+              }}
+              title="Sonraki Görsel"
+            >
+              &#10095;
+            </button>
+          )}
+        </div>
+      )}
     </div>
   );
 }
