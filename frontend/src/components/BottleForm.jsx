@@ -8,6 +8,7 @@ export default function BottleForm({ bottle, onClose, onSave }) {
     ek_bilgiler: '',
     icki_turu: '',
     sise_turu: '',
+    hacim_cl: '',
     fotograflar: [],
     alinma_tarihi: '',
     alindigi_yer: '',
@@ -52,6 +53,7 @@ export default function BottleForm({ bottle, onClose, onSave }) {
         ek_bilgiler: bottle.ek_bilgiler || '',
         icki_turu: bottle.icki_turu || '',
         sise_turu: bottle.sise_turu || '',
+        hacim_cl: bottle.hacim_cl !== null && bottle.hacim_cl !== undefined ? bottle.hacim_cl : '',
         fotograflar: bottle.fotograflar || [],
         alinma_tarihi: bottle.alinma_tarihi || '',
         alindigi_yer: bottle.alindigi_yer || '',
@@ -66,6 +68,18 @@ export default function BottleForm({ bottle, onClose, onSave }) {
       ...formData,
       [e.target.name]: e.target.value
     });
+  };
+
+  const handleVolumeBlur = () => {
+    if (formData.hacim_cl) {
+      const parsed = parseFloat(formData.hacim_cl);
+      if (!isNaN(parsed)) {
+        setFormData(prev => ({
+          ...prev,
+          hacim_cl: parsed.toFixed(2)
+        }));
+      }
+    }
   };
 
   // Client-side image compression using canvas
@@ -170,7 +184,8 @@ export default function BottleForm({ bottle, onClose, onSave }) {
       const payload = {
         ...formData,
         marka: null, // Merged into icki_adi
-        fiyat: formData.fiyat !== '' ? Number(formData.fiyat) : null
+        fiyat: formData.fiyat !== '' ? Number(formData.fiyat) : null,
+        hacim_cl: formData.hacim_cl !== '' ? Number(formData.hacim_cl) : null
       };
 
       if (bottle) {
@@ -234,7 +249,10 @@ export default function BottleForm({ bottle, onClose, onSave }) {
                 ))}
               </select>
             </div>
+            <div></div>
+          </div>
 
+          <div className="form-group-row">
             <div className="form-group">
               <label>Şişe Türü (Materyal)</label>
               <select name="sise_turu" value={formData.sise_turu} onChange={handleChange} disabled={loading}>
@@ -243,6 +261,21 @@ export default function BottleForm({ bottle, onClose, onSave }) {
                   <option key={m.id} value={m.name}>{m.name}</option>
                 ))}
               </select>
+            </div>
+
+            <div className="form-group">
+              <label>Şişe Hacmi (CL)</label>
+              <input
+                type="number"
+                step="0.01"
+                min="0"
+                name="hacim_cl"
+                value={formData.hacim_cl}
+                onChange={handleChange}
+                onBlur={handleVolumeBlur}
+                placeholder="Örn: 5.00"
+                disabled={loading}
+              />
             </div>
           </div>
 

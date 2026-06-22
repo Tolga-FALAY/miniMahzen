@@ -34,6 +34,7 @@ app.get('/api/bottles', (req, res) => {
             ...b,
             fotograflar: b.fotograflar ? JSON.parse(b.fotograflar) : [],
             fiyat: b.fiyat !== null ? Number(b.fiyat) : null,
+            hacim_cl: b.hacim_cl !== null ? Number(b.hacim_cl) : null,
             para_birimi: b.para_birimi || 'TL'
         }));
 
@@ -49,7 +50,7 @@ app.get('/api/bottles', (req, res) => {
 // POST - Create a new bottle
 app.post('/api/bottles', (req, res) => {
     try {
-        const { marka, icki_adi, ek_bilgiler, icki_turu, sise_turu, fotograflar, alinma_tarihi, alindigi_yer, fiyat, para_birimi } = req.body;
+        const { marka, icki_adi, ek_bilgiler, icki_turu, sise_turu, hacim_cl, fotograflar, alinma_tarihi, alindigi_yer, fiyat, para_birimi } = req.body;
         
         if (!icki_adi || !icki_adi.trim()) {
             return res.status(400).json({ error: 'İçki adı zorunludur!' });
@@ -59,8 +60,8 @@ app.post('/api/bottles', (req, res) => {
         const photosJSON = fotograflar ? JSON.stringify(fotograflar) : '[]';
 
         const stmt = db.prepare(`
-            INSERT INTO Bottles (id, marka, icki_adi, ek_bilgiler, icki_turu, sise_turu, fotograflar, alinma_tarihi, alindigi_yer, fiyat, para_birimi, createdAt, updatedAt)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+            INSERT INTO Bottles (id, marka, icki_adi, ek_bilgiler, icki_turu, sise_turu, hacim_cl, fotograflar, alinma_tarihi, alindigi_yer, fiyat, para_birimi, createdAt, updatedAt)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
         `);
 
         stmt.run(
@@ -70,6 +71,7 @@ app.post('/api/bottles', (req, res) => {
             ek_bilgiler ? ek_bilgiler.trim() : null,
             icki_turu || null,
             sise_turu || null,
+            hacim_cl !== undefined && hacim_cl !== '' ? Number(hacim_cl) : null,
             photosJSON,
             alinma_tarihi || null,
             alindigi_yer || null,
@@ -87,7 +89,7 @@ app.post('/api/bottles', (req, res) => {
 app.put('/api/bottles/:id', (req, res) => {
     try {
         const { id } = req.params;
-        const { marka, icki_adi, ek_bilgiler, icki_turu, sise_turu, fotograflar, alinma_tarihi, alindigi_yer, fiyat, para_birimi } = req.body;
+        const { marka, icki_adi, ek_bilgiler, icki_turu, sise_turu, hacim_cl, fotograflar, alinma_tarihi, alindigi_yer, fiyat, para_birimi } = req.body;
 
         if (!icki_adi || !icki_adi.trim()) {
             return res.status(400).json({ error: 'İçki adı zorunludur!' });
@@ -102,7 +104,7 @@ app.put('/api/bottles/:id', (req, res) => {
 
         const stmt = db.prepare(`
             UPDATE Bottles 
-            SET marka = ?, icki_adi = ?, ek_bilgiler = ?, icki_turu = ?, sise_turu = ?, fotograflar = ?, alinma_tarihi = ?, alindigi_yer = ?, fiyat = ?, para_birimi = ?, updatedAt = CURRENT_TIMESTAMP
+            SET marka = ?, icki_adi = ?, ek_bilgiler = ?, icki_turu = ?, sise_turu = ?, hacim_cl = ?, fotograflar = ?, alinma_tarihi = ?, alindigi_yer = ?, fiyat = ?, para_birimi = ?, updatedAt = CURRENT_TIMESTAMP
             WHERE id = ?
         `);
 
@@ -112,6 +114,7 @@ app.put('/api/bottles/:id', (req, res) => {
             ek_bilgiler ? ek_bilgiler.trim() : null,
             icki_turu || null,
             sise_turu || null,
+            hacim_cl !== undefined && hacim_cl !== '' ? Number(hacim_cl) : null,
             photosJSON,
             alinma_tarihi || null,
             alindigi_yer || null,

@@ -12,6 +12,24 @@ export default function BottleGrid({ bottles, categories = [], materials = [], o
     setMaterialFilter('');
   };
 
+  const formatCl = (cl) => {
+    if (cl === null || cl === undefined || cl === '') return '';
+    const num = Number(cl);
+    return isNaN(num) ? cl : num.toFixed(2);
+  };
+
+  const getMaterialVolumeText = (bottle) => {
+    const clText = formatCl(bottle.hacim_cl);
+    if (bottle.sise_turu && clText) {
+      return `${bottle.sise_turu} (${clText} cl)`;
+    } else if (bottle.sise_turu) {
+      return bottle.sise_turu;
+    } else if (clText) {
+      return `${clText} cl`;
+    }
+    return '';
+  };
+
   // Format currency helper
   const formatPrice = (val, currencyCode) => {
     if (val === null || val === undefined || val === '') return '';
@@ -37,6 +55,7 @@ export default function BottleGrid({ bottles, categories = [], materials = [], o
       const loc = (bottle.alindigi_yer || '').toLocaleLowerCase('tr-TR');
       const date = (bottle.alinma_tarihi || '').toLocaleLowerCase('tr-TR');
       const price = bottle.fiyat !== null ? String(bottle.fiyat) : '';
+      const volume = bottle.hacim_cl !== null ? String(bottle.hacim_cl) : '';
 
       const matchesAny = brand.includes(q) ||
                          name.includes(q) ||
@@ -45,7 +64,8 @@ export default function BottleGrid({ bottles, categories = [], materials = [], o
                          mat.includes(q) ||
                          loc.includes(q) ||
                          date.includes(q) ||
-                         price.includes(q);
+                         price.includes(q) ||
+                         volume.includes(q);
       if (!matchesAny) {
         return false;
       }
@@ -166,6 +186,11 @@ export default function BottleGrid({ bottles, categories = [], materials = [], o
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
                     <div className="bottle-meta" style={{ marginBottom: '0.15rem' }}>
                       <span className="bottle-category">{bottle.icki_turu || 'Diğer'}</span>
+                      {getMaterialVolumeText(bottle) && (
+                        <span className="bottle-category" style={{ textTransform: 'none' }}>
+                          {getMaterialVolumeText(bottle)}
+                        </span>
+                      )}
                     </div>
                     
                     {/* İçki Adı (Name) */}

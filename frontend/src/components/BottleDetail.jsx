@@ -14,7 +14,7 @@ export default function BottleDetail({ bottle, onClose, onEdit, onDelete }) {
 
   if (!bottle) return null;
 
-  const { id, marka, icki_adi, ek_bilgiler, icki_turu, sise_turu, fotograflar, alinma_tarihi, alindigi_yer, fiyat, para_birimi } = bottle;
+  const { id, marka, icki_adi, ek_bilgiler, icki_turu, sise_turu, hacim_cl, fotograflar, alinma_tarihi, alindigi_yer, fiyat, para_birimi } = bottle;
   const hasPhotos = fotograflar && fotograflar.length > 0;
 
   const resetZoom = () => {
@@ -235,6 +235,13 @@ export default function BottleDetail({ bottle, onClose, onEdit, onDelete }) {
                 <div className="detail-field">
                   <span className="field-label">Şişe Türü (Materyal)</span>
                   <span className="field-value">{sise_turu || 'Belirtilmemiş'}</span>
+                </div>
+
+                <div className="detail-field">
+                  <span className="field-label">Şişe Hacmi</span>
+                  <span className="field-value">
+                    {hacim_cl ? `${Number(hacim_cl).toFixed(2)} cl` : 'Belirtilmemiş'}
+                  </span>
                 </div>
 
                 <div className="detail-field">

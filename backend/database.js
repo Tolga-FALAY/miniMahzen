@@ -18,6 +18,7 @@ export const initializeDB = () => {
             ek_bilgiler TEXT, -- Extra details
             icki_turu TEXT,
             sise_turu TEXT,
+            hacim_cl REAL, -- Volume in CL
             fotograflar TEXT, -- Stored as JSON array of base64 images
             alinma_tarihi TEXT,
             alindigi_yer TEXT,
@@ -85,6 +86,11 @@ export const initializeDB = () => {
         if (!existingCols.includes('ek_bilgiler')) {
             console.log("Migrating database: Adding column ek_bilgiler to Bottles table...");
             db.exec("ALTER TABLE Bottles ADD COLUMN ek_bilgiler TEXT;");
+        }
+
+        if (!existingCols.includes('hacim_cl')) {
+            console.log("Migrating database: Adding column hacim_cl to Bottles table...");
+            db.exec("ALTER TABLE Bottles ADD COLUMN hacim_cl REAL;");
         }
     } catch (e) {
         console.error("Migration error while updating Bottles table:", e);
