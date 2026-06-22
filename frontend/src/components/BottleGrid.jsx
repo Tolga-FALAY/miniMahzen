@@ -15,7 +15,7 @@ export default function BottleGrid({ bottles, categories = [], materials = [], o
   const formatCl = (cl) => {
     if (cl === null || cl === undefined || cl === '') return '';
     const num = Number(cl);
-    return isNaN(num) ? cl : num.toFixed(2);
+    return isNaN(num) ? cl : num.toString();
   };
 
   const getMaterialVolumeText = (bottle) => {

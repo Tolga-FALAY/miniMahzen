@@ -240,7 +240,7 @@ export default function BottleDetail({ bottle, onClose, onEdit, onDelete }) {
                 <div className="detail-field">
                   <span className="field-label">Şişe Hacmi</span>
                   <span className="field-value">
-                    {hacim_cl ? `${Number(hacim_cl).toFixed(2)} cl` : 'Belirtilmemiş'}
+                    {hacim_cl !== null && hacim_cl !== undefined && hacim_cl !== '' ? `${Number(hacim_cl)} cl` : 'Belirtilmemiş'}
                   </span>
                 </div>
 

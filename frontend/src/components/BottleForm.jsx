@@ -76,7 +76,7 @@ export default function BottleForm({ bottle, onClose, onSave }) {
       if (!isNaN(parsed)) {
         setFormData(prev => ({
           ...prev,
-          hacim_cl: parsed.toFixed(2)
+          hacim_cl: parsed.toString()
         }));
       }
     }
