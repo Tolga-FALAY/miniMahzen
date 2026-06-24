@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import WhiskeyLogo from './WhiskeyLogo';
 
-export default function BottleGrid({ bottles, categories = [], materials = [], onSelectBottle }) {
+export default function BottleGrid({ bottles, categories = [], materials = [], onSelectBottle, cols = 4 }) {
   const [freeSearch, setFreeSearch] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('');
   const [materialFilter, setMaterialFilter] = useState('');
@@ -148,7 +148,7 @@ export default function BottleGrid({ bottles, categories = [], materials = [], o
 
       {/* Grid Results */}
       {sortedBottles.length > 0 ? (
-        <div className="bottles-grid">
+        <div className="bottles-grid" style={{ '--grid-cols': cols }}>
           {sortedBottles.map((bottle) => {
             const hasPhotos = bottle.fotograflar && bottle.fotograflar.length > 0;
             const mainPhoto = hasPhotos ? bottle.fotograflar[0] : null;

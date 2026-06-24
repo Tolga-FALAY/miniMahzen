@@ -362,7 +362,7 @@ option {
 /* Grid and Cards */
 .bottles-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  grid-template-columns: repeat(var(--grid-cols, 4), 1fr);
   gap: 2rem;
   margin-bottom: 3rem;
 }
@@ -1237,4 +1237,50 @@ option {
 .fullscreen-zoom-controls .zoom-btn.reset-btn {
   font-size: 1.1rem;
   color: var(--primary);
+}
+
+/* Column Grid Controls */
+.btn-col-control {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+  background: var(--bg-surface);
+  color: var(--text-main);
+  font-size: 1.2rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  user-select: none;
+  line-height: 1;
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-col-control:hover:not(:disabled) {
+  background: var(--primary-glow);
+  border-color: var(--primary);
+  color: var(--primary);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(2, 132, 199, 0.12);
+}
+
+.btn-col-control:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.btn-col-control:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.col-count-display {
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: var(--primary);
+  min-width: 20px;
+  text-align: center;
+  user-select: none;
 }

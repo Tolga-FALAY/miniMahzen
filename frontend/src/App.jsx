@@ -17,6 +17,23 @@ export default function App() {
   const [editingBottle, setEditingBottle] = useState(null);
   const [loading, setLoading] = useState(false);
 
+  // Dynamic grid column state (between 2 and 6) with local storage persistence
+  const [cols, setCols] = useState(() => {
+    const saved = localStorage.getItem('miniMahzenGridCols');
+    if (saved) {
+      const num = parseInt(saved, 10);
+      if (num >= 2 && num <= 6) return num;
+    }
+    return 4;
+  });
+
+  useEffect(() => {
+    localStorage.setItem('miniMahzenGridCols', cols);
+  }, [cols]);
+
+  const decreaseColumns = () => setCols(prev => Math.max(2, prev - 1));
+  const increaseColumns = () => setCols(prev => Math.min(6, prev + 1));
+
   // Fetch bottles from API
   const loadBottles = async () => {
     setLoading(true);
@@ -130,16 +147,65 @@ export default function App() {
           </div>
         ) : (
           <>
-            {/* Counter */}
+            {/* Grid Header Controls (Counter & Column adjustment) */}
             <div style={{
-              fontSize: '0.85rem',
-              color: 'var(--text-secondary)',
-              fontWeight: 600,
-              textTransform: 'uppercase',
-              letterSpacing: '0.5px',
-              marginBottom: '1rem'
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              marginBottom: '1.25rem',
+              flexWrap: 'wrap',
+              gap: '1rem'
             }}>
-              Koleksiyondaki Toplam Şişe: <span style={{ color: 'var(--primary)', fontWeight: 800 }}>{bottles.length}</span>
+              <div style={{
+                fontSize: '0.85rem',
+                color: 'var(--text-secondary)',
+                fontWeight: 600,
+                textTransform: 'uppercase',
+                letterSpacing: '0.5px'
+              }}>
+                Koleksiyondaki Toplam Şişe: <span style={{ color: 'var(--primary)', fontWeight: 800 }}>{bottles.length}</span>
+              </div>
+              
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.75rem',
+                background: 'var(--bg-surface)',
+                border: '1px solid var(--border-color)',
+                padding: '0.35rem 0.75rem',
+                borderRadius: 'var(--radius-md)',
+                boxShadow: 'var(--shadow-sm)'
+              }}>
+                <span style={{
+                  fontSize: '0.75rem',
+                  fontWeight: 700,
+                  color: 'var(--text-secondary)',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.5px',
+                  userSelect: 'none'
+                }}>
+                  Kolon:
+                </span>
+                <button 
+                  className="btn-col-control"
+                  onClick={decreaseColumns}
+                  disabled={cols <= 2}
+                  title="Kolon sayısını azalt (-)"
+                  type="button"
+                >
+                  −
+                </button>
+                <span className="col-count-display">{cols}</span>
+                <button 
+                  className="btn-col-control"
+                  onClick={increaseColumns}
+                  disabled={cols >= 6}
+                  title="Kolon sayısını artır (+)"
+                  type="button"
+                >
+                  +
+                </button>
+              </div>
             </div>
             
             <BottleGrid 
@@ -147,6 +213,7 @@ export default function App() {
               categories={categories}
               materials={materials}
               onSelectBottle={setSelectedBottle} 
+              cols={cols}
             />
           </>
         )}
