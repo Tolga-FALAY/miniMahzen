@@ -21,11 +21,11 @@ export default function BottleGrid({ bottles, categories = [], materials = [], o
   const getMaterialVolumeText = (bottle) => {
     const clText = formatCl(bottle.hacim_cl);
     if (bottle.sise_turu && clText) {
-      return `${bottle.sise_turu} (${clText} cl)`;
+      return `${bottle.sise_turu} (${clText}\u00a0cl)`;
     } else if (bottle.sise_turu) {
       return bottle.sise_turu;
     } else if (clText) {
-      return `${clText} cl`;
+      return `${clText}\u00a0cl`;
     }
     return '';
   };
